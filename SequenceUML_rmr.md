@@ -13,8 +13,8 @@ sequenceDiagram
         Client->>+Server: validateCookies();
         Server->>Database: requestUser(cookies);
         Database-->>Server: user is in database;
-        Server-->>-Client: isValid();
-
+        Server-->>-Client: isValid() [STATUS CODE: 200(OK)];
+        Client-->>User: refreshCookieExpiration();
         Client->>-Client: redirect to Cat Page;
     else Session cookies don't exists or expired
         Client->>+Client: redirect to Login Page;
@@ -27,20 +27,21 @@ sequenceDiagram
 
         alt credentials are correct
             Database-->>Server: user is in database;
-            Server-->>Client: [Accepted];
+            Server-->>Client: [STATUS CODE: 200];
+            Client-->>User: saveCookies();
             Client->>Client: redirect to Cat Page
         else incorrect email
-            Server-->>Client: [Rejected];
+            Server-->>Client: [STATUS CODE: 401];
             Client-->>User: inform about that email don't exist in database;
         else incorrect phone
-            Server-->>Client: [Rejected];
+            Server-->>Client: [STATUS CODE: 401];
             Client-->>User: inform about incorrect phone;
         else incorrect password
-            Server-->>Client: [Rejected];
+            Server-->>Client: [STATUS CODE: 401];
             Client-->>User: inform about incorrect password;
         else user don't exist in database
             Database-->>Server: user not found;
-            Server-->>-Client: [Rejected];
+            Server-->>-Client: [STATUS CODE: 401];
             Client-->>-User: inform that user don't exist;
         end
     end
