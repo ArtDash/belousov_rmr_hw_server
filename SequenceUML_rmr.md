@@ -8,13 +8,11 @@ sequenceDiagram
     User->>+Client: opens site;
 
     alt Session cookies exists
-        User->>+Client: sendSessionCookies();
-
         Client->>+Server: validateCookies();
         Server->>Database: requestUser(cookies);
         Database-->>Server: user is in database;
         Server-->>-Client: isValid() [STATUS CODE: 200(OK)];
-        Client-->>User: refreshCookieExpiration();
+        Client->>Client: refreshCookieExpiration();
         Client->>-Client: redirect to Cat Page;
     else Session cookies don't exists or expired
         Client->>+Client: redirect to Login Page;
@@ -28,7 +26,7 @@ sequenceDiagram
         alt credentials are correct
             Database-->>Server: user is in database;
             Server-->>Client: [STATUS CODE: 200];
-            Client-->>User: saveCookies();
+            Client->>Client: saveCookies();
             Client->>Client: redirect to Cat Page
         else incorrect email
             Server-->>Client: [STATUS CODE: 401];
