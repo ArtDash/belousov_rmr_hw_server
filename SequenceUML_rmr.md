@@ -6,6 +6,7 @@ sequenceDiagram
     participant Database;
 
     User->>+Client: opens site;
+    activate User;
 
     alt Session cookies exists
         Client->>+Server: sendCookies();
@@ -13,7 +14,8 @@ sequenceDiagram
         Server-->>-Client: [STATUS CODE: 200];
         Client->>-Client: redirect to Cat Page;
     else Session cookies don't exists or expired
-        Client->>+Client: redirect to Login Page;
+        activate Client;
+        Client->>Client: redirect to Login Page;
 
         User->>Client: enter credentials;
 
@@ -26,6 +28,7 @@ sequenceDiagram
         end
 
         Server->>Database: requestUser(credentials);
+        activate Database;
         Server->>Server: validateCredentials();
 
 
@@ -40,8 +43,10 @@ sequenceDiagram
             Client-->>User: inform about incorrect password;
         else user don't exist in database
             Database-->>Server: user not found;
+            deactivate Database;
             Server-->>-Client: [STATUS CODE: 404];
             Client-->>-User: inform that user don't exist;
         end
     end
+    deactivate User;
 ```
