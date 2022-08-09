@@ -7,6 +7,7 @@ sequenceDiagram
 
     User->>+Client: opens site;
     activate User;
+    deactivate User;
 
     alt Session cookies exists
         Client->>+Server: sendCookies();
@@ -18,6 +19,7 @@ sequenceDiagram
         Client->>Client: redirect to Login Page;
 
         User->>Client: enter credentials;
+        activate User;
 
         alt phone and email correct
             Client->>+Server: sendCredentials();
@@ -25,6 +27,7 @@ sequenceDiagram
             Client-->>User: inform about incorrect email;
         else incorrect phone
             Client-->>User: inform about incorrect phone;
+            deactivate User;
         end
 
         Server->>Database: requestUser(credentials);
@@ -41,12 +44,15 @@ sequenceDiagram
             Database-->>Server: user is in database;
             Server-->>Client: [STATUS CODE: 400];
             Client-->>User: inform about incorrect password;
+            activate User;
+            deactivate User;
         else user don't exist in database
             Database-->>Server: user not found;
             deactivate Database;
             Server-->>-Client: [STATUS CODE: 404];
             Client-->>-User: inform that user don't exist;
+            activate User;
+            deactivate User;
         end
     end
-    deactivate User;
 ```
